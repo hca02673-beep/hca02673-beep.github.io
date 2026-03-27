@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pensée Note — 紙ノート音声索引アプリ</title>
+  <meta name="description" content="紙ノートに書いた情報を、音声で登録・即検索。何冊目の何ページにあるか、もう迷わない。試用版は完全無料・インストール不要。">
+  <meta property="og:title" content="Pensée Note — 紙ノート音声索引アプリ">
+  <meta property="og:description" content="紙ノートに書いた情報を、音声で登録・即検索。試用版は完全無料。">
+  <meta property="og:image" content="assets/pascal.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:       #1B5E35;
+      --green-dark:  #114023;
+      --green-light: #2d7a50;
+      --gold:        #C9A84C;
+      --gold-light:  #e8c870;
+      --cream:       #F8F5EE;
+      --cream-dark:  #ede8dd;
+      --white:       #ffffff;
+      --text:        #1c1c1c;
+      --text-light:  #5a5a5a;
+      --shadow:      0 4px 28px rgba(0,0,0,0.09);
+      --radius:      14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── ボタン共通 ────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--green); color: var(--white);
+      padding: 16px 40px; border-radius: 50px;
+      font-size: 1rem; font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: all .28s; border: 2px solid var(--green); cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: var(--green-dark); transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(27,94,53,.32);
+    }
+
+    .btn-outline-gold {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: transparent; color: var(--gold);
+      padding: 14px 38px; border-radius: 50px;
+      font-size: 1rem; font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: all .28s; border: 2px solid var(--gold); cursor: pointer;
+    }
+    .btn-outline-gold:hover {
+      background: var(--gold); color: var(--white); transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(201,168,76,.3);
+    }
+
+    /* ── HEADER ────────────────────────── */
+    header {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(17, 64, 35, 0.97); backdrop-filter: blur(10px);
+      padding: 14px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .header-logo { height: 38px; }
+
+    .header-nav { display: flex; gap: 20px; align-items: center; }
+
+    .nav-link {
+      color: rgba(255,255,255,0.80); font-size: 0.88rem;
+      padding-bottom: 2px; border-bottom: 1px solid transparent;
+      transition: all .2s;
+    }
+    .nav-link:hover { color: var(--gold); border-color: var(--gold); }
+
+    .nav-btn-try {
+      background: var(--gold); color: var(--green-dark);
+      padding: 10px 26px; border-radius: 50px;
+      font-weight: 700; font-size: 0.88rem;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: all .25s;
+    }
+    .nav-btn-try:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    /* ── HERO ─────────────────────────── */
+    .hero {
+      position: relative; min-height: 92vh;
+      display: flex; align-items: center; overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: url('assets/pascal.png') center 18% / cover no-repeat;
+    }
+
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,
+        rgba(17,64,35,.82) 0%,
+        rgba(17,64,35,.55) 55%,
+        rgba(0,0,0,.4) 100%);
+    }
+
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 820px; padding: 100px 56px 100px 64px;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      border: 1px solid rgba(201,168,76,.6);
+      background: rgba(201,168,76,.12);
+      color: var(--gold); font-size: 0.78rem;
+      letter-spacing: .18em; padding: 6px 18px;
+      border-radius: 50px; margin-bottom: 28px;
+      font-family: 'Playfair Display', serif; font-style: italic;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      color: var(--white); line-height: 1.2; margin-bottom: 18px;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+
+    .hero-subhead {
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      color: rgba(255,255,255,.88); margin-bottom: 20px; font-weight: 400;
+    }
+
+    .hero-desc {
+      font-size: 0.97rem; color: rgba(255,255,255,.72);
+      line-height: 1.9; margin-bottom: 44px; max-width: 540px;
+    }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+
+    .hero-note {
+      margin-top: 14px; color: rgba(255,255,255,.52); font-size: 0.78rem;
+    }
+
+    /* ── SECTION 共通 ─────────────────── */
+    section { padding: 100px 40px; }
+
+    .inner { max-width: 1080px; margin: 0 auto; }
+
+    .s-label {
+      display: block; font-family: 'Playfair Display', serif; font-style: italic;
+      color: var(--gold); font-size: 0.82rem; letter-spacing: .18em;
+      margin-bottom: 10px;
+    }
+
+    .s-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--green); line-height: 1.3; margin-bottom: 18px;
+    }
+
+    .s-lead {
+      font-size: 1.02rem; color: var(--text-light);
+      max-width: 640px; line-height: 1.95; margin-bottom: 60px;
+    }
+
+    /* ── CONCEPT ──────────────────────── */
+    .concept { background: var(--white); }
+
+    .concept-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: center;
+    }
+
+    .concept-text { }
+
+    .concept-quote {
+      border-left: 4px solid var(--gold);
+      padding-left: 24px; margin: 32px 0;
+    }
+
+    .concept-quote blockquote {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: 1.2rem; color: var(--green); line-height: 1.75;
+    }
+
+    .concept-quote cite {
+      display: block; margin-top: 8px; font-size: 0.83rem;
+      color: var(--text-light); font-style: normal;
+    }
+
+    .concept-text p {
+      font-size: 0.97rem; color: var(--text-light);
+      line-height: 1.9; margin-bottom: 18px;
+    }
+
+    .concept-img {
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.15);
+    }
+    .concept-img img { width: 100%; height: 440px; object-fit: cover; object-position: center 15%; }
+
+    /* ── FEATURES ─────────────────────── */
+    .features { background: var(--cream); }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+
+    .feature-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 44px 32px; box-shadow: var(--shadow);
+      transition: transform .3s;
+    }
+    .feature-card:hover { transform: translateY(-5px); }
+
+    .feature-icon { font-size: 2.6rem; margin-bottom: 22px; }
+
+    .feature-card h3 {
+      font-size: 1.18rem; color: var(--green); margin-bottom: 14px;
+    }
+
+    .feature-card p { font-size: 0.93rem; color: var(--text-light); line-height: 1.85; }
+
+    /* ── HOW TO USE ───────────────────── */
+    .howto { background: var(--white); }
+
+    .steps {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 48px; position: relative;
+    }
+
+    .steps::before {
+      content: ''; position: absolute;
+      top: 31px;
+      left: calc(16.67% + 20px); right: calc(16.67% + 20px);
+      height: 2px;
+      background: linear-gradient(to right, var(--gold), var(--green));
+    }
+
+    .step { text-align: center; padding: 0 12px; }
+
+    .step-num {
+      width: 62px; height: 62px; border-radius: 50%;
+      background: var(--green); color: var(--gold);
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 22px; position: relative; z-index: 1;
+      box-shadow: 0 4px 16px rgba(27,94,53,.25);
+    }
+
+    .step h3 { font-size: 1.08rem; color: var(--green); margin-bottom: 12px; }
+    .step p { font-size: 0.9rem; color: var(--text-light); line-height: 1.85; }
+
+    /* ── PRICING ──────────────────────── */
+    .pricing { background: var(--cream); }
+
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(5,1fr);
+      gap: 18px; align-items: start;
+    }
+
+    .plan-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 32px 18px 28px; text-align: center;
+      box-shadow: var(--shadow); border: 2px solid transparent;
+      transition: all .3s; display: flex; flex-direction: column;
+    }
+
+    .plan-card.rec {
+      border-color: var(--green); transform: scale(1.045);
+      box-shadow: 0 10px 44px rgba(27,94,53,.18);
+    }
+
+    .plan-badge {
+      display: inline-block; background: var(--green); color: var(--white);
+      font-size: 0.68rem; font-weight: 700; letter-spacing: .06em;
+      padding: 3px 14px; border-radius: 50px; margin-bottom: 14px;
+    }
+
+    .plan-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; color: var(--green); margin-bottom: 6px;
+    }
+
+    .plan-limit { font-size: 0.75rem; color: var(--text-light); margin-bottom: 20px; }
+
+    .plan-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700; color: var(--text); margin-bottom: 2px;
+    }
+    .plan-price span { font-size: 0.8rem; font-family: 'Noto Sans JP', sans-serif; font-weight: 300; color: var(--text-light); }
+
+    .plan-price-note { font-size: 0.72rem; color: var(--text-light); margin-bottom: 22px; }
+
+    .plan-features {
+      list-style: none; margin-bottom: 28px; text-align: left;
+      flex: 1;
+    }
+
+    .plan-features li {
+      font-size: 0.83rem; color: var(--text-light);
+      padding: 7px 0; border-bottom: 1px solid var(--cream-dark);
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .plan-btn {
+      display: block; width: 100%; padding: 12px;
+      border-radius: 50px; font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 0.88rem;
+      cursor: pointer; transition: all .28s;
+      border: 2px solid var(--green); background: transparent; color: var(--green);
+    }
+    .plan-btn:hover { background: var(--green); color: var(--white); }
+
+    .plan-card.rec .plan-btn { background: var(--green); color: var(--white); }
+    .plan-card.rec .plan-btn:hover { background: var(--green-dark); }
+
+    .plan-btn-free { border-color: var(--cream-dark); background: var(--cream); color: var(--text-light); }
+    .plan-btn-free:hover { background: var(--cream-dark); color: var(--text); border-color: var(--cream-dark); }
+
+    /* ── FINAL CTA ────────────────────── */
+    .cta-final {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+      text-align: center; padding: 100px 40px;
+    }
+
+    .cta-final h2 { font-size: clamp(1.8rem,4vw,2.8rem); color: var(--white); margin-bottom: 18px; }
+    .cta-final p { color: rgba(255,255,255,.78); font-size: 1rem; margin-bottom: 48px; line-height: 1.85; }
+
+    .cta-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; }
+
+    .btn-white {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--white); color: var(--green);
+      padding: 16px 40px; border-radius: 50px;
+      font-size: 1rem; font-weight: 700;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: all .28s; border: 2px solid var(--white);
+    }
+    .btn-white:hover { background: transparent; color: var(--white); }
+
+    .cta-final .btn-outline-gold { color: var(--gold); }
+    .cta-final .btn-outline-gold:hover { background: var(--gold); color: var(--green-dark); }
+
+    /* ── FOOTER ───────────────────────── */
+    footer { background: var(--green-dark); color: rgba(255,255,255,.65); padding: 48px 40px; }
+
+    .footer-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 20px;
+    }
+
+    .footer-logo { height: 30px; opacity: .85; }
+    .footer-info { font-size: 0.83rem; }
+    .footer-info p { margin-bottom: 3px; }
+
+    /* ── RESPONSIVE ───────────────────── */
+    @media (max-width: 960px) {
+      .concept-grid { grid-template-columns: 1fr; gap: 40px; }
+      .concept-img { order: -1; }
+      .concept-img img { height: 300px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr; gap: 32px; }
+      .steps::before { display: none; }
+      .pricing-grid { grid-template-columns: repeat(2,1fr); }
+      .plan-card.rec { transform: none; }
+      .hero-content { padding: 80px 32px; }
+    }
+
+    @media (max-width: 600px) {
+      section { padding: 64px 20px; }
+      header { padding: 14px 20px; }
+      .nav-link { display: none; }
+      .hero-content { padding: 64px 24px; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     HEADER
+══════════════════════════════════ -->
+<header>
+  <a href="#">
+    <img class="header-logo" src="assets/logo.png" alt="Pensée Note">
+  </a>
+  <nav class="header-nav">
+    <a class="nav-link" href="#features">特長</a>
+    <a class="nav-link" href="#howto">使い方</a>
+    <a class="nav-link" href="#pricing">プラン</a>
+    <a class="nav-btn-try" href="https://hca02673-beep.github.io/panseenote/">無料で試す</a>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════
+     HERO
+══════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Pensées Note — 紙ノート音声索引アプリ</span>
+    <h1>断片メモを、<em>知識</em>にする。</h1>
+    <p class="hero-subhead">紙ノートに書いた情報を、音声で登録・即検索</p>
+    <p class="hero-desc">
+      何冊目の何ページに書いたか、もう迷わない。<br>
+      パスカルの『パンセ』のように、日々の断片メモを<br>
+      知識として活かすための音声索引アプリです。
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://hca02673-beep.github.io/panseenote/">
+        ▶ 無料で試す（インストール不要）
+      </a>
+      <a class="btn-outline-gold" href="#pricing">プランを見る</a>
+    </div>
+    <p class="hero-note">試用版は登録上限30件・完全無料。アカウント登録も不要。</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     CONCEPT
+══════════════════════════════════ -->
+<section class="concept">
+  <div class="inner">
+    <div class="concept-grid">
+      <div class="concept-text">
+        <span class="s-label">Concept</span>
+        <h2 class="s-title">紙ノートのよさを<br>そのまま活かす</h2>
+        <div class="concept-quote">
+          <blockquote>
+            "人間は考える葦である"
+          </blockquote>
+          <cite>— Blaise Pascal, Pensées</cite>
+        </div>
+        <p>フランスの哲学者・科学者パスカルの遺稿集『パンセ』は、日々書き留めたメモが後に体系化されたものです。断片的なメモには、大切な気づきや必要な情報が眠っています。</p>
+        <p>パンセノートは、紙ノートに書いた情報の「場所」を音声で素早く登録し、必要なときに即座に検索できる索引アプリです。紙の書き心地はそのままに、「あれはどこに書いたか」という問題を解決します。</p>
+        <p>データはブラウザ内のみに保存され、クラウドへの送信はありません。PWA対応でオフラインでも動作します。</p>
+      </div>
+      <div class="concept-img">
+        <img src="assets/pascal.png" alt="パスカルのイメージ">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FEATURES
+══════════════════════════════════ -->
+<section class="features" id="features">
+  <div class="inner">
+    <span class="s-label">Features</span>
+    <h2 class="s-title">3つの特長</h2>
+    <p class="s-lead">音声・手入力の両方に対応し、紙ノートの索引として日常利用に最適化しています。</p>
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="feature-icon">🎤</div>
+        <h3>音声で素早く登録</h3>
+        <p>「3冊目42ページ 換気扇型番」と声に出すだけで自動登録。タイピング不要で、紙に書いた直後に場所を記録できます。認識終了時にビープ音が鳴るので、画面を見ずに操作できます。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>音声・手動で即検索</h3>
+        <p>見出しの部分一致で全件を高速検索。英数字・カタカナの表記ゆれを正規化処理で吸収するため、うろ覚えのキーワードでも見つかります。検索結果は最大50件を一覧表示します。</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>オフラインでも使えるPWA</h3>
+        <p>ホーム画面に追加すればアプリのように起動可能。一度ライセンス認証すれば、インターネット不要でオフライン利用できます。Windows・Android・iPhone（Safari）に対応しています。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     HOW TO USE
+══════════════════════════════════ -->
+<section class="howto" id="howto">
+  <div class="inner">
+    <span class="s-label">How to use</span>
+    <h2 class="s-title">使い方は3ステップ</h2>
+    <p class="s-lead">はじめての方も迷わない、シンプルな操作フロー。</p>
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>紙ノートにメモを書く</h3>
+        <p>いつも通り紙ノートに書くだけ。何冊目か、何ページかを把握しておくだけでOKです。</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>声で場所を登録する</h3>
+        <p>「○冊目○ページ △△」と声に出すだけで自動登録。手入力でも登録できます。</p>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>キーワードで検索する</h3>
+        <p>後から思い出したいとき、キーワードで検索。何冊目の何ページかが瞬時に分かります。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     PRICING
+══════════════════════════════════ -->
+<section class="pricing" id="pricing">
+  <div class="inner">
+    <span class="s-label">Pricing</span>
+    <h2 class="s-title">プラン・料金</h2>
+    <p class="s-lead">試用版は登録件数30件まで完全無料。有料プランはすべて買い切り型です。</p>
+    <div class="pricing-grid">
+
+      <!-- 試用版 -->
+      <div class="plan-card">
+        <p class="plan-name">試用版</p>
+        <p class="plan-limit">登録上限 30件</p>
+        <p class="plan-price">¥0<span> 無料</span></p>
+        <p class="plan-price-note">アカウント登録不要</p>
+        <ul class="plan-features">
+          <li>索引登録・検索</li>
+          <li>音声入力（登録・検索）</li>
+          <li>PWA・オフライン対応</li>
+          <li>JSONバックアップ</li>
+        </ul>
+        <a class="plan-btn plan-btn-free" href="https://hca02673-beep.github.io/panseenote/">今すぐ試す</a>
+      </div>
+
+      <!-- スターター -->
+      <div class="plan-card">
+        <p class="plan-name">スターター</p>
+        <p class="plan-limit">登録上限 100件</p>
+        <p class="plan-price">¥980<span> 買い切り</span></p>
+        <p class="plan-price-note">税込</p>
+        <ul class="plan-features">
+          <li>試用版の全機能</li>
+          <li>登録100件まで</li>
+          <li>ライセンスキー発行</li>
+          <li>購入後メールでお届け</li>
+        </ul>
+        <a class="plan-btn" href="YOUR_LS_STARTER_URL">購入する</a>
+      </div>
+
+      <!-- ベーシック -->
+      <div class="plan-card">
+        <p class="plan-name">ベーシック</p>
+        <p class="plan-limit">登録上限 200件</p>
+        <p class="plan-price">¥1,980<span> 買い切り</span></p>
+        <p class="plan-price-note">税込</p>
+        <ul class="plan-features">
+          <li>試用版の全機能</li>
+          <li>登録200件まで</li>
+          <li>ライセンスキー発行</li>
+          <li>購入後メールでお届け</li>
+        </ul>
+        <a class="plan-btn" href="YOUR_LS_BASIC_URL">購入する</a>
+      </div>
+
+      <!-- スタンダード（おすすめ） -->
+      <div class="plan-card rec">
+        <span class="plan-badge">おすすめ</span>
+        <p class="plan-name">スタンダード</p>
+        <p class="plan-limit">登録上限 10,000件</p>
+        <p class="plan-price">¥2,980<span> 買い切り</span></p>
+        <p class="plan-price-note">税込</p>
+        <ul class="plan-features">
+          <li>試用版の全機能</li>
+          <li>登録10,000件まで</li>
+          <li>ライセンスキー発行</li>
+          <li>購入後メールでお届け</li>
+        </ul>
+        <a class="plan-btn" href="YOUR_LS_STANDARD_URL">購入する</a>
+      </div>
+
+      <!-- プレミアム -->
+      <div class="plan-card">
+        <p class="plan-name">プレミアム</p>
+        <p class="plan-limit">登録上限 30,000件</p>
+        <p class="plan-price">¥4,980<span> 買い切り</span></p>
+        <p class="plan-price-note">税込</p>
+        <ul class="plan-features">
+          <li>試用版の全機能</li>
+          <li>登録30,000件まで</li>
+          <li>ライセンスキー発行</li>
+          <li>購入後メールでお届け</li>
+        </ul>
+        <a class="plan-btn" href="YOUR_LS_PREMIUM_URL">購入する</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FINAL CTA
+══════════════════════════════════ -->
+<section class="cta-final">
+  <div class="inner">
+    <h2>まずは無料で試してみる</h2>
+    <p>
+      インストール不要。アカウント登録も不要。<br>
+      ブラウザを開くだけで今すぐ使えます。
+    </p>
+    <div class="cta-actions">
+      <a class="btn-white" href="https://hca02673-beep.github.io/panseenote/">
+        ▶ 無料で試す
+      </a>
+      <a class="btn-outline-gold" href="#pricing">プランを選ぶ</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════
+     FOOTER
+══════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <img class="footer-logo" src="assets/logo.png" alt="Pensée Note">
+    <div class="footer-info">
+      <p>© 2026 桂水会合同会社</p>
+      <p>Pensée Note — 紙ノート音声索引アプリ</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
