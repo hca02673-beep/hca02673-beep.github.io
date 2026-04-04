@@ -10,10 +10,10 @@
 (function () {
   "use strict";
 
-  var C  = window.PANSEE_CONFIG;
-  var db = window.PanseeDB;
-  var voice = window.PanseeVoice;
-  var norm = window.panseeNormalize;
+  var C     = window.PANSEE_CONFIG;
+  var db    = window.PANSEE_db;
+  var voice = window.PANSEE_voice;
+  var norm  = window.PANSEE_normalizeForSearch;
 
   function $(sel) {
     return document.querySelector(sel);
