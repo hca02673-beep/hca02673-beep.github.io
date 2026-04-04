@@ -584,11 +584,13 @@ td.readonly {
 }
 
 .actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  align-items: center;
-  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.actions button {
+  margin: 0.15rem;
+  vertical-align: middle;
 }
 
 .entries-table td.col-actions {
@@ -1021,10 +1023,11 @@ button.sm {
   }
 
   .actions {
-    gap: 0.25rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    text-align: center;
+    padding: 0.1rem;
+  }
+  .actions button {
+    margin: 0.1rem;
   }
 }
 
