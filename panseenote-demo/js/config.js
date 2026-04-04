@@ -26,8 +26,8 @@
 
     DEFAULT_PLAN_CODE: "demo",
     DEFAULT_PLAN_NAME: "体験版",
-    /** 体験機の登録上限（試供品サイズ） */
-    DEFAULT_ITEM_LIMIT: 25,
+    /** 体験機の登録上限（seed 25件 + 体験用5枠） */
+    DEFAULT_ITEM_LIMIT: 30,
 
     /** seed データのデフォルトセット名（?set=<name> で切替可） */
     DEMO_DEFAULT_SET: "lady",

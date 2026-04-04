@@ -68,7 +68,7 @@
     }
     if (entryCount >= limit) {
       setEntryLimitInlineWarning(
-        "体験機の登録上限（" + limit + "件）です。製品版（試用版・無料）は100件まで登録できます"
+        "体験機の登録上限（" + limit + "件）に達しました。「最初からやり直す」でリセットできます。製品版（試用版・無料）は100件まで登録できます"
       );
       return;
     }
@@ -483,7 +483,7 @@
             "体験機の登録上限（" + state.license.itemLimit + "件）に達しています。保存できません。"
           );
           setEntryLimitInlineWarning(
-            "体験機の登録上限（" + state.license.itemLimit + "件）に達しているため保存できません。"
+            "体験機の登録上限（" + state.license.itemLimit + "件）に達しているため保存できません。「最初からやり直す」でリセットできます。"
           );
           return;
         }
@@ -613,7 +613,7 @@
         state.searchQuery = "";
         if ($("#manual-search")) $("#manual-search").value = "";
         setEntryLimitInlineWarning(
-          "体験機の登録上限（" + state.license.itemLimit + "件）です。製品版（試用版・無料）は100件まで登録できます"
+          "体験機の登録上限（" + state.license.itemLimit + "件）に達しました。「最初からやり直す」でリセットできます。製品版（試用版・無料）は100件まで登録できます"
         );
         return saveSearchQueryToSettings("").then(function () {
           return renderTable();
